@@ -6,9 +6,9 @@ import me.michaelbrylevskii.sql.builder.model.predicate.LogicalPredicate
 import me.michaelbrylevskii.sql.builder.model.predicate.Predicate
 import me.michaelbrylevskii.sql.builder.model.query.Query
 import me.michaelbrylevskii.sql.builder.model.query.SelectQuery
-import me.michaelbrylevskii.sql.builder.model.query.selection.AllSelection
-import me.michaelbrylevskii.sql.builder.model.query.selection.ExpressionSelection
-import me.michaelbrylevskii.sql.builder.model.query.selection.Selection
+import me.michaelbrylevskii.sql.builder.model.selection.AllSelection
+import me.michaelbrylevskii.sql.builder.model.selection.ExpressionSelection
+import me.michaelbrylevskii.sql.builder.model.selection.Selection
 import me.michaelbrylevskii.sql.builder.model.source.Container
 import me.michaelbrylevskii.sql.builder.model.source.Source
 import me.michaelbrylevskii.sql.builder.model.source.Table
@@ -155,13 +155,52 @@ open class ConfigurableQueryWriter(
     protected fun <A : Appendable> A.appendExpressionPredicate(
         predicate: ExpressionPredicate
     ): A = apply {
-        TODO()
+        if (predicate.args.size == 2) {
+            val firstArg = predicate.args[0]
+            val secondArg = predicate.args[1]
+            appendExpression(firstArg)
+            append(" ")
+            append(predicate.operator)
+            append(" ")
+            appendExpression(secondArg)
+        } else TODO("Not yet implemented")
     }
 
     protected fun <A : Appendable> A.appendLogicalPredicate(
         predicate: LogicalPredicate
     ): A = apply {
-        TODO()
+        when {
+            predicate.operator == "NOT" && predicate.args.size == 1 -> {
+                append("NOT (")
+                appendPredicate(predicate.args[0])
+                append(")")
+            }
+            predicate.operator == "AND" && predicate.args.size >= 2 -> {
+                appendList(predicate.args, delimiter = " AND ") { arg ->
+                    val needWrap = arg is LogicalPredicate && arg.operator == "OR"
+                    if (needWrap) {
+                        append("(")
+                    }
+                    appendPredicate(arg)
+                    if (needWrap) {
+                        append(")")
+                    }
+                }
+            }
+            predicate.operator == "OR" && predicate.args.size >= 2 -> {
+                appendList(predicate.args, delimiter = " OR ") { arg ->
+                    val needWrap = arg is LogicalPredicate && arg.operator == "AND"
+                    if (needWrap) {
+                        append("(")
+                    }
+                    appendPredicate(arg)
+                    if (needWrap) {
+                        append(")")
+                    }
+                }
+            }
+            else -> TODO("Not yet implemented")
+        }
     }
 
     // ------------------
@@ -255,6 +294,7 @@ open class ConfigurableQueryWriter(
 
     protected fun <A : Appendable, T : Any> A.appendList(
         items: Iterable<T>,
+        delimiter: String = ", ",
         appender: A.(T) -> Unit = { append(it.toString()) }
     ): A = apply {
         val iterator = items.iterator()
@@ -264,7 +304,7 @@ open class ConfigurableQueryWriter(
             appender(iterator.next())
             hasNext = iterator.hasNext()
             if (hasNext) {
-                append(", ")
+                append(delimiter)
             }
         }
     }

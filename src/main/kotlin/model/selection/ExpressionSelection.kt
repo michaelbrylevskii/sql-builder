@@ -1,4 +1,4 @@
-package me.michaelbrylevskii.sql.builder.model.query.selection
+package me.michaelbrylevskii.sql.builder.model.selection
 
 import me.michaelbrylevskii.sql.builder.model.expression.Expression
 

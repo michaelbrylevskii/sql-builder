@@ -1,6 +1,7 @@
-package me.michaelbrylevskii.sql.builder.model.source
+package me.michaelbrylevskii.sql.builder.model.join
 
 import me.michaelbrylevskii.sql.builder.model.predicate.Predicate
+import me.michaelbrylevskii.sql.builder.model.source.Source
 
 data class ConditionalJoin(
     override val source: Source,
