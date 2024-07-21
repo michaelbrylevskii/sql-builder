@@ -6,8 +6,9 @@ import me.michaelbrylevskii.sql.builder.writer.ConfigurableQueryWriter
 
 fun main() {
     println("Hello World!")
+    println()
 
-    val query = selectQuery {
+    val query1 = selectQuery {
         val accounts = from(table = "accounts", alias = "a")
         val transactions = from(table = "transactions", alias = "t")
 
@@ -37,12 +38,22 @@ fun main() {
         )
     }
 
+    val query2 = selectQuery {
+        val accounts = from(query1, alias = "internal")
+        selectAll()
+        where(accounts.column("id") notEq literal(12345))
+    }
+
     val writer = ConfigurableQueryWriter()
 
-    val sql = writer.write(query)
+    val sql1 = writer.write(query1)
+    println("Select query 1:")
+    println(sql1)
+    println()
 
-    println("SQL:")
-    println(sql)
+    val sql2 = writer.write(query2)
+    println("Select query 2:")
+    println(sql2)
     println()
 }
 

@@ -111,6 +111,9 @@ class SelectQueryDsl {
     infix fun Expression.eq(expression: Expression): ExpressionPredicate =
         ExpressionPredicate(operator = "=", args = listOf(this, expression))
 
+    infix fun Expression.notEq(expression: Expression): ExpressionPredicate =
+        ExpressionPredicate(operator = "!=", args = listOf(this, expression))
+
     infix fun not(predicate: Predicate): LogicalPredicate =
         LogicalPredicate(operator = "NOT", args = listOf(predicate))
 
