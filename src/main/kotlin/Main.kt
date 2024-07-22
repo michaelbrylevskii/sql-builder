@@ -32,9 +32,9 @@ fun main() {
         where(predicate = accounts.column("status") eq literal("ACTIVE"))
         where(
             (transactions.column("accountNumber") eq accounts.column("number"))
-                    and (not(transactions.column("accountNumber") eq literal("0000")))
-                    and ((transactions.column("unit") eq literal("RU"))
-                    or (transactions.column("unit") eq literal("KZ")))
+                    and (not(transactions.column("accountNumber") eq "0000"))
+                    and ((transactions.column("unit") eq "RU")
+                    or (transactions.column("unit") eq "KZ"))
         )
     }
 

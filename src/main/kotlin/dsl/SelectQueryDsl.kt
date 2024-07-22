@@ -103,7 +103,7 @@ class SelectQueryDsl {
     }
 
     fun literal(value: Any?): LiteralExpression =
-        LiteralExpression(value = value)
+        value as? LiteralExpression ?: LiteralExpression(value = value)
 
     fun Source.column(name: String): ColumnExpression =
         ColumnExpression(name = name, source = this)
@@ -111,8 +111,14 @@ class SelectQueryDsl {
     infix fun Expression.eq(expression: Expression): ExpressionPredicate =
         ExpressionPredicate(operator = "=", args = listOf(this, expression))
 
+    infix fun Expression.eq(value: Any?): ExpressionPredicate =
+        eq(literal(value))
+
     infix fun Expression.notEq(expression: Expression): ExpressionPredicate =
         ExpressionPredicate(operator = "!=", args = listOf(this, expression))
+
+    infix fun Expression.notEq(value: Any?): ExpressionPredicate =
+        notEq(literal(value))
 
     infix fun not(predicate: Predicate): LogicalPredicate =
         LogicalPredicate(operator = "NOT", args = listOf(predicate))
